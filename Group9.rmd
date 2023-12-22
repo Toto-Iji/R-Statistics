@@ -1,0 +1,56 @@
+---
+title: "Group 9"
+author: "Andrey Sumadic, Aeron Jesse Edombingo, Ariane Soldevilla"
+date: "2023-12-20"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r reviews}
+#install.packages("rvest")
+library(rvest)
+url <- "https://www.amazon.com/dp/B0CHWRXH8B/ref=va_live_carousel?pf_rd_r=V3MNET3SVF8MNH31WGD1&pf_rd_p=70a812bb-9e27-462b-9447-8e4f4192dafb&pf_rd_m=ATVPDKIKX0DER&pf_rd_t=HighVelocityEvent&pf_rd_i=deals_1_desktop&pf_rd_s=slot-13&asc_contentid=amzn1.amazonlive.broadcast.91145b89-d264-42ba-9726-ea6c8a7ab746&pd_rd_i=B0CHWRXH8B&th=1&psc=1"
+url
+scrape <- read_html(url)
+```
+```{r}
+scrape_amazon_reviews <- function(url, max_reviews = 300) {
+  scrape <- read_html(url)
+
+  username <- scrape %>%
+    html_nodes(".a-profile-name") %>%
+    html_text()
+
+  ratings <- scrape %>%
+    html_nodes(".review-rating") %>%
+    html_text()
+
+  reviews <- scrape %>%
+    html_nodes(".review-text-content span") %>%
+    html_text()
+
+  # Find the minimum length among the vectors
+  min_length <- min(length(username), length(ratings), length(reviews))
+
+  # Create a data frame only with complete rows
+  data <- data.frame(
+    Username = username[1:min_length],
+    Ratings = ratings[1:min_length],
+    Reviews = reviews[1:min_length]
+  )
+
+  return(data)
+}
+
+reviews_data <- scrape_amazon_reviews(url, max_reviews = 300)
+reviews_data
+
+
+
+
+```
